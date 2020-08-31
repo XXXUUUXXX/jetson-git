@@ -1,31 +1,16 @@
 import cv2 as cv
 import numpy as np
 import time
-from adafruit_servokit import ServoKit
+
 
 print(cv.__version__)
 
-timeMark = time.time()          # 时间标记
-dtFIL = 0                       # 低通滤波，表示时间变化
-
-width = 640                     # 800 640 1280 1920
-height = 480                    # 600 480 720  1080
-flip = 2                        # 设置翻转
-
-font = cv.FONT_HERSHEY_SIMPLEX  # 设置字体
-
-kit = ServoKit(channels=16)     # 视频驱动通道有16个
-
-tilt = 90                       # 倾斜角度
-pan = 90                        # 水平角度
-
-dTilt = 10                       # 移动刻度
-dPan = 1                        # 移动刻度
-
-kit.servo[0].angle = pan        # 水平舵机-cam1
-kit.servo[1].angle = tilt       # 倾斜舵机-cam1
-kit.servo[2].angle = pan        # 水平舵机-cam2
-kit.servo[3].angle = tilt       # 倾斜舵机-cam2
+timeMark = time.time() # 时间标记
+dtFIL = 0       # 低通滤波，表示时间变化
+width = 640     # 800 640 1280 1920
+height = 480    # 600 480 720  1080
+flip=2          # 设置翻转
+font = cv.FONT_HERSHEY_SIMPLEX # 设置字体
 
 # G streamer 是从摄像机源到显示器源的通道
 
@@ -43,23 +28,24 @@ kit.servo[3].angle = tilt       # 倾斜舵机-cam2
 # camSet = 'nvarguscamerasrc sensor-id=0 ! video/x-raw(memory:NVMM), width=3264, height=2464, framerate=21/1, format=NV12 ! nvvidconv flip-method=‘+str(flip)+’ ! video/x-raw, width='+str(width)+', height='+str(height)+', format=BGRx ! videoconvert ! video/x-raw, format=BGR ! appsink' 
 
 # drop=True 可以消除延迟
-camSet1 = 'nvarguscamerasrc sensor-id=0 ee-mode=2 ee-strength=0 tnr-mode=3 tnr-strength=1 wbmode=3 ! video/x-raw(memory:NVMM), width=3264, height=2464, framerate=21/1, format=NV12 ! nvvidconv flip-method=‘+str(flip)+’ ! video/x-raw, width='+str(width)+', height='+str(height)+', format=BGRx ! videoconvert ! video/x-raw, format=BGR ! videobalance contrast=1.5 brightness=-.15 saturation=1.2 ! appsink drop=True' 
-camSet2 = 'nvarguscamerasrc sensor-id=1 ee-mode=2 ee-strength=0 tnr-mode=3 tnr-strength=1 wbmode=3 ! video/x-raw(memory:NVMM), width=3264, height=2464, framerate=21/1, format=NV12 ! nvvidconv flip-method=‘+str(flip)+’ ! video/x-raw, width='+str(width)+', height='+str(height)+', format=BGRx ! videoconvert ! video/x-raw, format=BGR ! videobalance contrast=1.5 brightness=-.15 saturation=1.2 ! appsink drop=True' 
+# camSet1 = 'nvarguscamerasrc sensor-id=0 ee-mode=2 ee-strength=0 tnr-mode=3 tnr-strength=1 wbmode=3 ! video/x-raw(memory:NVMM), width=3264, height=2464, framerate=21/1, format=NV12 ! nvvidconv flip-method=‘+str(flip)+’ ! video/x-raw, width='+str(width)+', height='+str(height)+', format=BGRx ! videoconvert ! video/x-raw, format=BGR ! videobalance contrast=1.5 brightness=-.15 saturation=1.2 ! appsink drop=True' 
+# camSet2 = 'nvarguscamerasrc sensor-id=1 ee-mode=2 ee-strength=0 tnr-mode=3 tnr-strength=1 wbmode=3 ! video/x-raw(memory:NVMM), width=3264, height=2464, framerate=21/1, format=NV12 ! nvvidconv flip-method=‘+str(flip)+’ ! video/x-raw, width='+str(width)+', height='+str(height)+', format=BGRx ! videoconvert ! video/x-raw, format=BGR ! videobalance contrast=1.5 brightness=-.15 saturation=1.2 ! appsink drop=True' 
 
-cam1 = cv.VideoCapture(camSet1)
-cam2 = cv.VideoCapture(camSet2)
+# cam1 = cv.VideoCapture(camSet1)
+# cam2 = cv.VideoCapture(camSet2)
 # USB摄像头捕获
 # 方法一
-# cam3 = cv.VideoCapture('/dev/video0') 
+cam3 = cv.VideoCapture('/dev/video0') 
 # 方法二，没成功运行
 # camSet = 'v4l2src device=/dev/video0 ! video/x-raw, width='+str(width)+', height='+str(height)+', framerate=25/1 ! videoconvert ! appsink'
 # cam = cv.VideoCapture(camSet)
 
 while True:
-    _, frame1 = cam1.read()
-    _, frame2 = cam2.read()
+    # _, frame1 = cam1.read()
+    # _, frame2 = cam2.read()
+    _, frame3 = cam3.read()
 
-    frame3 = np.hstack((frame1, frame2)) # 组合框架1和2
+    # frame3 = np.hstack((frame1, frame2)) # 组合框架1和2
     dt = time.time() - timeMark          # 时间种子
     timeMark = time.time()               # 新的时间标记
     dtFIL = .9*dtFIL + .1*dt             # 低通滤波
@@ -76,18 +62,6 @@ while True:
     # cv.moveWindow('myCam1', 0, 0)      # 窗口坐标，左上角
     # cv.moveWindow('myCam2', 0, 500)    # 窗口坐标，下移500
     cv.moveWindow('comboCam', 0, 0)      # 窗口坐标，左上角
-
-    kit.servo[0].angle = pan             # 水平舵机-cam1
-    kit.servo[2].angle = pan             # 水平舵机-cam2
-    pan = pan + dPan
-    if pan >= 179 or pan <= 1:
-        dPan = dPan * (-1)
-        kit.servo[1].angle = tilt        # 倾斜舵机-cam1 
-        kit.servo[3].angle = tilt        # 倾斜舵机-cam2
-        tilt = tilt + dTilt              # 实现类似扫描功能，先水平，侯倾斜
-        if tilt >= 169 or tilt <= 11:
-            dTilt = dTilt * (-1)
-
 
     if cv.waitKey(1) == ord('q'): # 键盘绑定函数
         break
