@@ -1,0 +1,14 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/jetson/Desktop/jetson-git/learn_jetson/Hello_AI_World/image_recognition_c++/my-recognition.cpp
+jetson-inference/imageNet.h
+-
+jetson-utils/loadImage.h
+-
+

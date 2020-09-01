@@ -1,0 +1,3 @@
+/home/jetson/Desktop/jetson-git/learn_jetson/Hello_AI_World/image_recognition_c++/build/CMakeFiles/rebuild_cache.dir
+/home/jetson/Desktop/jetson-git/learn_jetson/Hello_AI_World/image_recognition_c++/build/CMakeFiles/my-recognition.dir
+/home/jetson/Desktop/jetson-git/learn_jetson/Hello_AI_World/image_recognition_c++/build/CMakeFiles/edit_cache.dir
